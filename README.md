@@ -26,11 +26,11 @@ with a single given block of code:
 >>> with out_loss_of_generality(lambda x, y: x % 2 == 0 and y % 2 == 1):
 ...     print("x: %d" % x)
 ...     print("y: %d" % y)
-... 
+...
 x: 94
 y: 327
->>> x
-327
->>> y
-94
 ```
+
+Specifically, `wlog.py` will try all permutations of binding existing local identifiers to existing values in the current scope until it finds one that satisfies a given predicate. It will rebind the identifiers defined as the lambda's parameters to the satisfying values, then restore their original values once the enclosed block is exited.
+
+What could go wrong?

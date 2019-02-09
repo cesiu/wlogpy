@@ -11,8 +11,7 @@ import ctypes
 class out_loss_of_generality:
     def __init__(self, predicate):
         self.predicate = predicate
-        self.shadowed_locals = {}
-        self.shadowed_globals = {}
+        self.shadowed = {}
 
     # Tries to rebind identifiers in the caller's environment to satisfy the
     #  given predicate.
@@ -24,15 +23,15 @@ class out_loss_of_generality:
         environment = global_env.copy()
         environment.update(local_env)
 
-        # Figure out which bindings we might need to change.
+        # Figure out which local bindings we might need to change.
         identifiers = list(inspect.signature(self.predicate).parameters.keys())
         for identifier in identifiers:
             if identifier in local_env:
-                self.shadowed_locals[identifier] = local_env[identifier]
+                self.shadowed[identifier] = local_env[identifier]
             elif identifier in global_env:
-                self.shadowed_globals[identifier] = global_env[identifier]
+                raise Exception("Error: '%s' is global." % identifier)
             else:
-                raise Exception("Error: Identifier '%s' unbound." % identifier)
+                raise Exception("Error: '%s' is unbound." % identifier)
 
         # First, try all permutations of locals, then, of all values.
         if not self.shadow(
@@ -53,21 +52,17 @@ class out_loss_of_generality:
                         ctypes.pythonapi.PyFrame_LocalsToFast(
                          ctypes.py_object(frame), ctypes.c_int(0))
                     return True
-            except TypeError:
+            except:
                 pass
         return False
 
     # Restores bindings changed by the context manager.
     def __exit__(self, exc_type, exc_value, traceback):
-        # Restore the caller's local and global environments
+        # Restore the caller's local environment
         frame = inspect.stack()[1].frame
         local_env = frame.f_locals
-        global_env = frame.f_globals
 
-        for identifier in self.shadowed_locals:
-            local_env[identifier] = self.shadowed_locals[identifier]
+        for identifier in self.shadowed:
+            local_env[identifier] = self.shadowed[identifier]
             ctypes.pythonapi.PyFrame_LocalsToFast(
              ctypes.py_object(frame), ctypes.c_int(0))
-
-        for identifier in self.shadowed_globals:
-            global_env[identifier] = self.shadowed_globals[identifier]

@@ -16,8 +16,7 @@ of generality", allowing the writer to trust his readers to mentally fill in
 the blanks and apply the single given argument to any other cases.
 
 Now, you can bring the same magic to Python, allowing programmers to trust the
-interpreter to implicitly fill in the blanks and adjust any other cases to work
-with a single given block of code:
+interpreter to implicitly fill in the blanks and apply the single given block of code to any other cases:
 
 ```python
 >>> from wlog import *

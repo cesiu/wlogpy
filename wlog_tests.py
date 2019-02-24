@@ -115,8 +115,10 @@ class TestWLOG(unittest.TestCase):
             self.assertEqual(['a', 'b'], x)
             self.assertEqual([1, 2, 3], y)
 
+            x.append('c')
+
         self.assertEqual([1, 2, 3], x)
-        self.assertEqual(['a', 'b'], y)
+        self.assertEqual(['a', 'b', 'c'], y)
 
 
 if __name__ == "__main__":
